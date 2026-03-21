@@ -14,7 +14,7 @@ const resultMessage = document.getElementById("result-message");
 const restartButton = document.getElementById("restart-btn");
 const progressBar = document.getElementById("progress");
 
-
+// Quize questions
 const quizQuestions = [
     {
         question: "In which year did Virat Kohli score his first Test double century?",
@@ -64,7 +64,6 @@ const quizQuestions = [
 ]
 
 // Quiz state vars
-
 let currentQuestionIndex = 0;
 let score = 0;
 let answersDisabled = false;
@@ -77,10 +76,8 @@ startButton.addEventListener("click", startQuiz)
 restartButton.addEventListener("click", restartQuiz);
 
 function startQuiz(){
-    currentQuestionIndex = 0;
-    score = 0;
-    answersDisabled = false;
 
+    progressBar.style.width = "0%";
     scoreSpan.textContent = 0;
 
     startScreen.classList.remove("active");
@@ -97,7 +94,7 @@ function showQuestion(){
 
     currentQuestionSpan.textContent = currentQuestionIndex + 1;
 
-    const progressPercent = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+    const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
     progressBar.style.width = progressPercent + "%";
 
     questionText.textContent = currentQuestion.question;
@@ -111,7 +108,7 @@ function showQuestion(){
         button.classList.add("answer-btn");
 
         // What is dataset?  it is a property of the button element that allows you to store custom data 
-        button.dataset.correct = answer.correct;
+        button.correct = answer.correct;
 
         button.addEventListener("click", selectAnswer)
 
@@ -123,14 +120,14 @@ function selectAnswer(event) {
     if(answersDisabled) return;
     answersDisabled = true;
     const selectedButton = event.target;
-    const isCorrect = selectedButton.dataset.correct === "true";
+    const isCorrect = selectedButton.correct;
 
     // explain in a sec
     Array.from(answerContainer.children).forEach(button => {
-        if(button.dataset.correct === "true"){
+        if(button.correct){
             button.classList.add("correct");
         }
-        else{
+        else if(button === selectedButton){
             button.classList.add("incorrect");
         }
     });
@@ -143,12 +140,15 @@ function selectAnswer(event) {
     setTimeout(() => {
         currentQuestionIndex++;
         // check if there are more questions or if quiz is over
-        if(currentQuestionIndex < quizQuestions.length) {
-            showQuestion()
-        }
-        else{
-            showResults()
-        }
+            if(currentQuestionIndex === quizQuestions.length){
+                progressBar.style.width = "100%";
+                showResults();
+            }
+             else{
+                const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
+                progressBar.style.width = progressPercent + "%";
+                showQuestion();
+            }
     }, 1000)
 }
 
